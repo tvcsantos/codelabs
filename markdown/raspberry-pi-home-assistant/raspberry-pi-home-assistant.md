@@ -195,7 +195,7 @@ connected to. If you respond "no", you can enter WiFi credentials manually.
 
 The **hostname** option defines the hostname your Raspberry Pi broadcasts to the network using mDNS. When you connect
 your Raspberry Pi to your network, other devices on the network can communicate with your computer
-using `<hostname>.local` or `<hostname>.lan`.
+using `{{hostname}}.local` or `{{hostname}}.lan`.
 
 The **username and password** option defines the username and password of the admin user account on your Raspberry Pi.
 
@@ -772,24 +772,280 @@ mode. When detected follow the configurations steps and you should be ready to g
 
 Duration: 1:00:00
 
-> aside negative
-> **TODO**: This is still a work in progress.
+If you want to control your smart home devices from outside your home network, you will need to expose Home Assistant to
+the Internet. Also, some integrations require Home Assistant to be exposed to the Internet.
+
+To expose Home Assistant to the Internet, we will use the DuckDNS and SWAG. DuckDNS is a free service that allows you to
+create a subdomain and associate it with your public IP address. SWAG sets up a Nginx webserver and reverse proxy with
+php support and a built-in certbot client that automates free SSL server certificate generation and renewal processes
+(Let's Encrypt and ZeroSSL). SWAG also contains fail2ban for intrusion prevention.
+
+With these two tools, we will be able to expose Home Assistant to the Internet using a secure connection.
 
 ### Setup DuckDNS
 
-> aside negative
-> **TODO**: This is still a work in progress.
+First, we need to create a DuckDNS account. You can do this by going to the following link:
+
+* <https://www.duckdns.org/>
+
+You should see a screen similar to the following:
+
+![DuckDNS Welcome Screen](img/duckdns-homepage.png)
+
+Create an account, or login if we already have one. After that, something like this should appear:
+
+![DuckDNS Dashboard](img/duckdns-logged.png)
+
+Copy the token and save it, you will need it later.
+
+Create a domain name. You can use any name you want, but it is recommended to use a name that is easy to remember. In
+this example, we will use `my-domain`.
+
+After this we need to keep DuckDNS in sync with our public IP address, so that when we access our domain name, we are
+redirected to our public IP address. To do this, we will use DuckDNS integration provided by Home Assistant.
+
+As first step login to your Raspberry Pi using SSH.
+
+```console
+ssh wintermute@hal9000.local
+```
+
+Now enter the Home Assistant container by running the following command:
+
+```console
+docker exec -it homeassistant bash
+```
+
+You will land in the Home Assistant container shell inside the `/config` directory. Now we need to edit the
+`configuration.yaml` file. To do this, run the following command:
+
+```console
+vi configuration.yaml
+```
+
+At the end of the file add the following lines:
+
+```yaml
+duckdns:
+  domain: {{your duckdns domain}}
+  access_token: {{your duckdns token}}
+```
+
+Replace `{{your duckdns domain}}` with the domain name you created in the previous step and `{{your duckdns token}}`
+with the token you copied in the previous step.
+
+So as an example, if your domain name is `my-domain` and your token is `12345678-1234-1234-1234-123456789012`, you
+should end up with something like this:
+
+```yaml
+duckdns:
+  domain: my-domain
+  access_token: 12345678-1234-1234-1234-123456789012
+```
+
+Now save the file by pressing <kbd>ESC</kbd>, followed by <kbd>:</kbd>, then <kbd>w</kbd>, then <kbd>q</kbd>,
+then <kbd>ENTER</kbd>.
+
+Exit the Home Assistant container by running the following command:
+
+```console
+exit
+```
+
+Now restart Home Assistant by running the following commands:
+
+```console
+docker compose down
+docker compose up -d
+```
+
+You should now have DuckDNS integration working.
 
 ### Setup Swag
 
-> aside negative
-> **TODO**: This is still a work in progress.
+Now that we have DuckDNS integration working, we can setup Swag. As first step login to your Raspberry Pi using SSH.
 
-## Takeaways
+```console
+ssh wintermute@hal9000.local
+```
 
-Duration: 0:10:00
+Now navigate to the directory where you created the `compose.yml` file.
 
-✅ < Fill IN TAKEAWAY 1>
-✅ < Fill IN TAKEAWAY 2>
+```console
+cd ~/docker/homeassistant
+```
 
-Thanks for participating in this codelab!
+And stop Home Assistant by running the following command:
+
+```console
+docker compose down
+```
+
+Wait for it to stop and then edit the `compose.yml` file using nano.
+
+```console
+nano compose.yml
+```
+
+Add the following lines to the `compose.yml` file:
+
+```yaml
+  swag:
+   container_name: swag
+   image: linuxserver/swag
+   restart: unless-stopped
+   cap_add:
+      - NET_ADMIN
+   volumes:
+      - ${HOME}/swag/config:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+   environment:
+      - PGID=1000
+      - PUID=1000
+      - EMAIL={{your email}}
+      - URL={{your duckdns domain}}.duckdns.org
+      - SUBDOMAINS=wildcard
+      - VALIDATION=duckdns
+      - TZ=Europe/Lisbon
+      - DUCKDNSTOKEN={{your duckdns token}}
+   ports:
+      - 180:80
+      - 1443:443
+
+# set trusted docker internal network
+networks:
+  default:
+     ipam:
+        config:
+           - subnet: 172.10.0.0/24
+```
+
+Replace `{{your email}}` with your email address that you used to create the DuckDNS account, `{{your duckdns domain}}`
+with the domain name you created in the previous step and `{{your duckdns token}}` with the token you copied in the
+previous step.
+
+After that save the file by pressing <kbd>CTRL</kbd> + <kbd>X</kbd>, followed by <kbd>Y</kbd>, then <kbd>ENTER</kbd>.
+
+Now start Home Assistant by running the following command:
+
+```console
+docker compose up -d
+```
+
+If all goes well you should now have SWAG running. You can check the logs by running the following command:
+
+```console
+docker compose logs -f swag
+```
+
+You should see something like this, stating that all went well:
+
+```text
+swag | [services.d] starting services
+swag | [services.d] done.
+swag | Server ready.
+```
+
+Now we need to configure SWAG Nginx server. First check the IP address of your Raspberry Pi by running the following
+
+```console
+ip a | grep -E 'wlan0|eth0'
+```
+
+You should see something like this:
+
+![Raspberry Pi IP Address](img/find_ip_address.png)
+
+Note that we have two IP addresses, one for the `eth0` interface corresponding to the Ethernet port and one for the
+`wlan0` interface corresponding to the WiFi port. Always prefer the `eth0` interface, as it is more stable.
+
+In this case the IP address is `192.168.1.142`, save this information, you will need it later.
+
+Now enter the SWAG container by running the following command:
+
+```console
+docker exec -it swag bash
+```
+
+You will land in the SWAG container shell inside the root `/` directory. Navigate to `/config/nginx/proxy-confs`
+directory by running the following command:
+
+```console
+cd /config/nginx/proxy-confs
+``` 
+
+There you will find a file called `homeassistant.subdomain.conf.sample`. Copy it to a new file called
+`homeassistant.subdomain.conf` by running the following command:
+
+```console
+cp homeassistant.subdomain.conf.sample homeassistant.subdomain.conf
+```
+
+Normally, in docker-compose, SWAG/NGINX would know the IP address of home assistant But since it uses ‘net mode’ we need
+to tell it the IP address of home assistant. To do this issue the following command:
+
+```console
+sed -i 's/set $upstream_app homeassistant;/set $upstream_app 192.168.1.142;/' homeassistant.subdomain.conf
+```
+
+Don't forget to replace `192.168.1.142` with the IP address of your Raspberry Pi that you got earlier.
+
+Exit the SWAG container by running the following command:
+
+```console
+exit
+```
+
+Now enter the Home Assistant container by running the following command:
+
+```console
+docker exec -it homeassistant bash
+```
+
+You will land in the Home Assistant container shell inside the `/config` directory. Now we need to edit the
+`configuration.yaml` file. To do this, run the following command:
+
+```console
+vi configuration.yaml
+```
+
+Before `duckdns` configuration add the following lines:
+
+```yaml
+http:
+  ip_ban_enabled: true
+  login_attempts_threshold: 3
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.0/24  # Local Lan
+    - 172.10.0.0/24  # Docker network
+```
+
+Note that you will need to replace `192.168.1.0` with the equivalent IP address of your local network. If your local
+network is `192.168.XXX.YYY` you will need to replace it with `192.168.XXX.0`.
+
+Save the file by pressing <kbd>ESC</kbd>, followed by <kbd>:</kbd>, then <kbd>w</kbd>, then <kbd>q</kbd>,
+then <kbd>ENTER</kbd>.
+
+Exit the Home Assistant container by running the following command:
+
+```console
+exit
+```
+
+Now restart all containers by running the following commands:
+
+```console
+docker compose down
+docker compose up -d
+```
+
+Wait for a few minutes for everything to start. You are now ready from the Home Assistant side. The last thing missing
+is to configure your router to forward the ports `80` and `443` to your Raspberry Pi IP address. Please refer to your
+router manual on how to do this.
+
+After this, you should be able to access Home Assistant from the Internet. To do this, navigate to
+<https://homeassistant.my-domain.duckdns.org>. You should see the Home Assistant login screen.
+
+Note that you will need to replace `my-domain` with the domain name you created on DuckDNS.
