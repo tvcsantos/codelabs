@@ -1,0 +1,488 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>H.A.R.P. - Home Assistant Raspberry Pi</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="raspberry-pi-home-assistant"
+                  title="H.A.R.P. - Home Assistant Raspberry Pi"
+                  environment="web"
+                  feedback-link="https://github.com/tvcsantos/codelabs/blob/master/markdown/raspberry-pi-home-assistant">
+    
+      <google-codelab-step label="Overview" duration="5">
+        <p class="image-container"><img alt="HARP" src="img/c65584b24f3d5325.jpeg"></p>
+<p><strong>Welcome to project HARP!</strong></p>
+<p>In the days of the Internet of Things, it is common to have a lot of smart devices at home. These devices are usually controlled by different apps, which makes it difficult to manage them. Home Assistant is an open-source home automation platform that allows you to control all your smart devices from a single interface. It is a great tool to manage your smart home devices, but it can also be used to automate your home.</p>
+<p>Home Assistant also provides integration with Amazon Alexa and Google Assistant, which allows you to control your smart home devices using voice commands. Apple HomeKit integration is also available, by using the Home Assistant Homebridge plugin. This allows you to control your smart home devices using Siri. With all these integrations, you can unify all your smart home devices under a single interface and control them using voice commands.</p>
+<p>This project is a step-by-step tutorial that will teach you how to setup a Raspberry Pi with Home Assistant to control your smart home devices. You will learn the following:</p>
+<ul>
+<li>How to setup a Raspberry Pi <ul>
+<li>Install Raspberry Pi OS</li>
+<li>Expand Filesystem</li>
+<li>Increase Swap Size</li>
+<li>Install Docker</li>
+</ul>
+</li>
+<li>How to setup Home Assistant</li>
+<li>How to install the Home Assistant Sky Connect</li>
+<li>How to expose Home Assistant to the Internet <ul>
+<li>Setup DuckDNS</li>
+<li>Setup Swag</li>
+</ul>
+</li>
+</ul>
+<p>Hopefully, by the end of this tutorial, you will have a fully functional Home Assistant setup that you can use to control your smart home devices. Enjoy!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisites" duration="10">
+        <p>For this project, you will need the following:</p>
+<ul>
+<li>A Raspberry Pi (at least version 3)</li>
+<li>A microSD card (at least 32GB class 10)</li>
+<li>A power supply for the Raspberry Pi (please use the official Raspberry Pi power supply)</li>
+<li>Home Assistant Sky Connect for Zigbee (optional)</li>
+</ul>
+<h2 is-upgraded>Raspberry Pi</h2>
+<p>The Raspberry Pi is a small single-board computer that can be used for a variety of projects. It is a great tool for learning about computers and programming. It is also a great tool for building your own smart home. The Raspberry Pi is a very popular platform for home automation projects, because it is cheap and easy to use. It is also very easy to connect to other devices, such as sensors and actuators.</p>
+<p>For this project you will need at least a Raspberry Pi 3. At the time of writing this tutorial, the latest version of the Raspberry Pi is the Raspberry Pi 5. You can follow the links below with more information about the different Raspberry Pi models, that you can use for this project:</p>
+<ul>
+<li><a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b/" target="_blank">https://www.raspberrypi.com/products/raspberry-pi-3-model-b/</a></li>
+<li><a href="https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/" target="_blank">https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/</a></li>
+<li><a href="https://www.raspberrypi.com/products/raspberry-pi-4-model-b/" target="_blank">https://www.raspberrypi.com/products/raspberry-pi-4-model-b/</a></li>
+<li><a href="https://www.raspberrypi.com/products/raspberry-pi-5/" target="_blank">https://www.raspberrypi.com/products/raspberry-pi-5/</a></li>
+</ul>
+<p>In those links you have also information on how to buy a Raspberry Pi from the official resellers on your country.</p>
+<h2 is-upgraded>MicroSD card</h2>
+<p>Your Raspberry Pi needs an SD card to store all its files and the Raspberry Pi OS operating system.</p>
+<p>For this project and taking into account future expansion, I recommend using a microSD card with at least 32GB of storage. You can use any microSD card, but it is recommended to use a class 10 microSD card.</p>
+<p>A good example is the SanDisk 32GB Ultra MicroSDHC C10 A1. It should look like the following:</p>
+<p class="image-container"><img alt="SanDisk MicroSD" src="img/b3e7a6e1d4011d58.jpg"></p>
+<p>You can find is easily on Amazon or other online stores.</p>
+<h2 is-upgraded>Power supply</h2>
+<p>The Raspberry Pi needs a power supply to work. You can use any power supply that provides the correct voltage and amperage, but it is recommended to use the official Raspberry Pi power supply. You can find it also in your official reseller or on Amazon or other online stores.</p>
+<p>The official power supplies usually have a Raspberry Pi logo on them.</p>
+<p class="image-container"><img alt="Raspberry Pi 1, 2, 3 Power Supply" src="img/71eb473a25d8ecd9.png"><img alt="Raspberry Pi 4, 400 Power Supply" src="img/bf01c37be20a6b07.png"><img alt="Raspberry Pi 5 Power Supply" src="img/6954f2eeb8e3abdb.png"></p>
+<p>For the official power supply follow the link below:</p>
+<ul>
+<li>Raspberry Pi 3 - <a href="https://www.raspberrypi.com/products/raspberry-pi-universal-power-supply/" target="_blank">https://www.raspberrypi.com/products/raspberry-pi-universal-power-supply/</a></li>
+<li>Raspberry Pi 4 - <a href="https://www.raspberrypi.com/products/type-c-power-supply/" target="_blank">https://www.raspberrypi.com/products/type-c-power-supply/</a></li>
+<li>Raspberry Pi 5 - <a href="https://www.raspberrypi.com/products/27w-power-supply/" target="_blank">https://www.raspberrypi.com/products/27w-power-supply/</a></li>
+</ul>
+<h2 is-upgraded>Home Assistant Sky Connect</h2>
+<p>The Home Assistant Sky Connect is a Zigbee gateway that allows you to connect Zigbee devices to Home Assistant. It is based on the CC2531 chip and it is compatible with the Zigbee2MQTT project. It is a great tool to connect Zigbee devices to Home Assistant, has a low price and is ease to use.</p>
+<p>It should come in a box similar to the following:</p>
+<p class="image-container"><img alt="Home Assistant Sky Connect" src="img/9171ca92f524b440.jpg"></p>
+<p>You can find more information about the Home Assistant Sky Connect on the following link:</p>
+<ul>
+<li><a href="https://www.home-assistant.io/skyconnect/" target="_blank">https://www.home-assistant.io/skyconnect/</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Install Raspberry Pi OS" duration="30">
+        <aside class="special"><p><strong>Info: </strong><em>This step has content transcribed from the official Raspberry Pi documentation, that you can find here: </em><a href="https://www.raspberrypi.com/documentation/computers/getting-started.html#setting-up-your-raspberry-pi" target="_blank"><em>https://www.raspberrypi.com/documentation/computers/getting-started.html#setting-up-your-raspberry-pi</em></a></p>
+</aside>
+<p>In order to install Home Assistant on your Raspberry Pi, you first need to install the Raspberry Pi OS operating system. The Raspberry Pi OS is a Linux distribution based on Debian. It is the official operating system for the Raspberry Pi and it is the recommended operating system for this project.</p>
+<h2 is-upgraded>Install Raspberry Pi Imager</h2>
+<p>The easiest way to install the Raspberry Pi OS is to use the Raspberry Pi Imager tool. This tool allows you to download and install the Raspberry Pi OS on your microSD card. You can download the Raspberry Pi Imager tool from the official Raspberry Pi website:</p>
+<ul>
+<li><a href="https://www.raspberrypi.com/software/" target="_blank">https://www.raspberrypi.com/software/</a></li>
+</ul>
+<p>Choose the Raspberry Pi Imager tool for your operating system. You can find versions for Windows, macOS and Ubuntu.</p>
+<h2 is-upgraded>Flash Raspberry Pi OS</h2>
+<p>After installing the Raspberry Pi Imager tool, you can use it to flash the Raspberry Pi OS into your microSD card. Once you&#39;ve installed Imager, launch the application by clicking the Raspberry Pi Imager icon or running <code>rpi-imager</code>.</p>
+<p class="image-container"><img alt="Raspberry Pi Imager main window" src="img/50f390f798e00de5.png"></p>
+<p>Click <strong>Choose device</strong> and select your Raspberry Pi model from the list.</p>
+<aside class="warning"><p><strong>Note:</strong> Sometimes filtering by Raspberry Pi device can be misleading. For example at the time of writing for a Raspberry Pi 3 Model B the Imager tool does not recommend the last Wormhole OS Lite version, which is also compatible with this model.</p>
+</aside>
+<p class="image-container"><img alt="Raspberry Pi model selections in Imager" src="img/10c6fb203ac6b417.png"></p>
+<p>Next, click <strong>Choose OS</strong> and select an operating system to install. Imager always shows the recommended version of Raspberry Pi OS for your model at the top of the list.</p>
+<p class="image-container"><img alt="Operating system selections in Imager" src="img/bec30e2c1e257a03.png"></p>
+<p>Connect your preferred storage device to your computer. For example, plug a microSD card in using an external or built-in SD card reader. Then, click <strong>Choose storage</strong> and select your storage device.</p>
+<aside class="warning"><p><strong>Warning</strong>: If you have more than one storage device connected to your computer, be sure to choose the correct device! You can often identify storage devices by size. If you&#39;re unsure, disconnect other devices until you&#39;ve identified the device you want to image.</p>
+</aside>
+<p class="image-container"><img alt="Storage selection options in Imager" src="img/f99573a068aac9e1.png"></p>
+<p>Next, click <strong>Next</strong>.</p>
+<p class="image-container"><img alt="Imager prompt to open OS customisation menu" src="img/cbd79891cfb2f090.png"></p>
+<p>In a popup, Imager will ask you to apply OS customisation. We will configure the Raspberry Pi via the OS customisation settings. Click the <strong>Edit Settings</strong> button to open OS customisation.</p>
+<h3 is-upgraded>OS customisation</h3>
+<p>The OS customisation menu lets you set up your Raspberry Pi before first boot. You can preconfigure:</p>
+<ul>
+<li>a username and password</li>
+<li>WiFi credentials</li>
+<li>the device hostname</li>
+<li>the time zone</li>
+<li>your keyboard layout</li>
+<li>remote connectivity</li>
+</ul>
+<p>When you first open the OS customisation menu, you might see a prompt asking for permission to load WiFi credentials from your host computer. If you respond &#34;yes&#34;, Imager will prefill WiFi credentials from the network you&#39;re currently connected to. If you respond &#34;no&#34;, you can enter WiFi credentials manually.</p>
+<p>The <strong>hostname</strong> option defines the hostname your Raspberry Pi broadcasts to the network using mDNS. When you connect your Raspberry Pi to your network, other devices on the network can communicate with your computer using <code><hostname>.local</code> or <code><hostname>.lan</code>.</p>
+<p>The <strong>username and password</strong> option defines the username and password of the admin user account on your Raspberry Pi.</p>
+<p>The <strong>wireless LAN</strong> option allows you to enter an SSID (name) and password for your wireless network. If your network does not broadcast an SSID publicly, you should enable the &#34;Hidden SSID&#34; setting. By default, Imager uses the country you&#39;re currently in as the &#34;Wireless LAN country&#34;. This setting controls the WiFi broadcast frequencies used by your Raspberry Pi. Enter credentials for the wireless LAN option if you plan to run a headless Raspberry Pi.</p>
+<p>The <strong>locale settings</strong> option allows you to define the time zone and default keyboard layout for your Pi.</p>
+<p class="image-container"><img alt="General settings in the OS customisation menu" src="img/85947d303f8b7fa7.png"></p>
+<p>The <strong>Services</strong> tab includes settings to help you connect to your Raspberry Pi remotely.</p>
+<p>Since we are going to use your Raspberry Pi remotely over the network, check the box next to <strong>Enable SSH</strong>.</p>
+<ul>
+<li>Choose the <strong>password authentication</strong> option to SSH into your Raspberry Pi over the network using the username and password you provided in the general tab of OS customisation.</li>
+<li>Choose <strong>Allow public-key authentication only</strong> to preconfigure your Raspberry Pi for passwordless public-key SSH authentication using a private key from the computer you&#39;re currently using. If already have an RSA key in your SSH configuration, Imager uses that public key. If you don&#39;t, you can click <strong>Run SSH-keygen</strong> to generate a public/private key pair. Imager will use the newly-generated public key.</li>
+</ul>
+<p class="image-container"><img alt="Services settings in the OS customisation menu" src="img/c0ea55665ccbabf1.png"></p>
+<p>OS customisation also includes an <strong>Options</strong> menu that allows you to configure the behaviour of Imager during a write. These options allow you to play a noise when Imager finishes verifying an image, to automatically unmount storage media after verification, and to disable telemetry.</p>
+<p class="image-container"><img alt="Options in the OS customisation menu" src="img/96cbd5089ab6d88d.png"></p>
+<h3 is-upgraded>Write</h3>
+<p>When you&#39;ve finished entering OS customisation settings, click <strong>Save</strong> to save your customisation.</p>
+<p>Then, click <strong>Yes</strong> to apply OS customisation settings when you write the image to the storage device.</p>
+<p>Finally, respond <strong>Yes</strong> to the &#34;Are you sure you want to continue?&#34; popup to begin writing data to the storage device.</p>
+<p class="image-container"><img alt="Confirming a reimage of a storage device in Imager" src="img/18070b9b2d777b0.png"></p>
+<p>If you see an admin prompt asking for permissions to read and write to your storage medium, it&#39;s safe to proceed.</p>
+<p class="image-container"><img alt="Writing an image to a device in Imager" src="img/9e78ed970858108a.png"></p>
+<p>Grab a cup of coffee or go for a walk. This could take a few minutes.</p>
+<p class="image-container"><img alt="Verifying an image on a device in Imager" src="img/ffd56981e66c8f86.png"></p>
+<p>If you want to live especially dangerously, you can click <strong>cancel verify</strong> to skip the verification process.</p>
+<p>When you see the &#34;Write Successful&#34; popup, your image has been completely written and verified. You&#39;re now ready to boot a Raspberry Pi from the storage device!</p>
+<p class="image-container"><img alt="The screen Imager shows when it finishes writing an image to a storage device" src="img/ada2614b2568abc6.png"></p>
+<p>That&#39;s it you are now ready too boot your Raspberry Pi. Insert the microSD card into the Raspberry Pi and connect the power supply. The Raspberry Pi should boot, wait a bit for the first boot to complete. Connect to your Raspberry Pi using SSH in your terminal:</p>
+<pre>ssh wintermute@hal9000.local
+</pre>
+<p>You should see a screen like the following</p>
+<p class="image-container"><img alt="Raspberry Pi SSH First Login" src="img/f3bd8436f28171e6.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Expand Filesystem" duration="5">
+        <p>In order to use the full capacity of your microSD card, you need to expand the filesystem. To do this, first, if you have not done it yet, login to your Raspberry Pi using SSH.</p>
+<pre>ssh wintermute@hal9000.local
+</pre>
+<p>Then run the following command:</p>
+<pre>sudo raspi-config nonint do_expand_rootfs
+</pre>
+<p>This will expand your installation to fill the whole SD card, giving you more space to use for files. You will need to reboot the Raspberry Pi to make this available. You can do this by running the following command:</p>
+<pre>sudo reboot
+</pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Increase Swap Size" duration="5">
+        <aside class="special"><p><strong>Info: </strong><em>This step has content transcribed from this tutorial: </em><a href="https://pimylifeup.com/raspberry-pi-swap-file/" target="_blank"><em>https://pimylifeup.com/raspberry-pi-swap-file/</em></a></p>
+</aside>
+<p>The swap file is used to increase the system&#39;s total accessible memory beyond its hardware capabilities.</p>
+<p>This means that when all of the Raspberry Pi&#39;s RAM is exhausted, it can start using the swap file as memory instead.</p>
+<p>The addition of more virtual memory allows the system to deal with more memory intensive tasks without running into out of memory errors or having to shut down other additional packages.</p>
+<p>However, the downside to this is that accessing the swap file is a significantly slower process that can create slowdowns.</p>
+<p>The reason for this is that the swap file exists on your actual disk, which has significantly lower read and write speeds then your RAM.</p>
+<p>Another caveat of a large swap file is that you need that space to be free on your SD Card. You can&#39;t set a swap file on your Raspberry Pi larger than your available free space.</p>
+<p>With the introduction of the Raspberry Pi 4, there has been less of a need to use a swap file due to the large amounts of RAM available. So if you&#39;re using a Raspberry Pi 4 or newer, you may not need to increase the swap file.</p>
+<aside class="special"><p><strong>Note</strong>: Swap space should be twice the size of RAM in case the RAM amount is below <strong>2GB</strong>. If RAM amounts to more than <strong>2GB</strong>, then swap space should be the size of RAM + <strong>2GB</strong>. For example, <strong>6GB</strong> of swap for <strong>4GB</strong> of RAM.</p>
+</aside>
+<p>In this section, we will be showing you the process of increasing the swap file on the Raspberry Pi.</p>
+<p>Before beginning this section, make sure you aren&#39;t running anything that&#39;s heavily using the memory. The reason for this is that it could potentially already be using the swap file that we are about to change.</p>
+<ol type="1">
+<li>If you have not done it yet, login to your Raspberry Pi using SSH.<pre>ssh wintermute@hal9000.local
+</pre>
+</li>
+<li>Before we can increase our Raspberry Pi&#39;s swap file, we must first temporarily stop it.The swap file cannot be in use while we increase it. To stop the operating system from using the current swap file, run the following command.<pre>sudo dphys-swapfile swapoff
+</pre>
+</li>
+<li>Next, we need to modify the swap file configuration file.We can open this file using nano by using the command below.<pre>sudo nano /etc/dphys-swapfile
+</pre>
+</li>
+<li>Within this config file, find the following line of text.You can use CTRL + W to search for text within the file.<pre>CONF_SWAPSIZE=100
+</pre>
+To increase or decrease the swap file, all you need to do is modify the numerical value you find here. This number is the size of the swap in megabytes.<aside class="warning"><p><strong>Warning</strong>: Whatever size you set, you must have that space available on your SD card.</p>
+</aside>
+For example, if we wanted to increase our swap size to <strong>1GB</strong>, we would change that line to the following.<pre>CONF_SWAPSIZE=1024
+</pre>
+</li>
+<li>Once you have made the change, save the file by pressing CTRL + X, followed by Y, then ENTER.</li>
+<li>We can now re-initialize the Raspberry Pi&#39;s swap file by running the command below.Running this command will delete the original swap file and recreate it to fit the newly defined size.<pre>sudo dphys-swapfile setup
+</pre>
+</li>
+<li>With the swap now recreated to the newly defined size, we can now turn the swap back on.To start the operating systems swap system, run the following command.<pre>sudo dphys-swapfile swapon
+</pre>
+While the new swapfile is now switched on, programs will not know that this new memory exists until they restart.</li>
+<li>If you want all programs to be reloaded with access to the new memory pool, then the easiest way is to restart your device.To restart your Raspberry Pi, all you need to do is run the command below.<pre>sudo reboot
+</pre>
+</li>
+</ol>
+<p>We hope you have successfully learned how to increase and decrease the swap file on your Raspberry Pi.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Install Docker" duration="30">
+        <aside class="special"><p><strong>Info: </strong><em>This step has content transcribed from these tutorials:</em></p>
+<ul>
+<li><a href="https://docs.docker.com/engine/install/debian/#install-using-the-repository" target="_blank"><em>https://docs.docker.com/engine/install/debian/#install-using-the-repository</em></a></li>
+<li><a href="https://pimylifeup.com/raspberry-pi-docker/" target="_blank"><em>https://pimylifeup.com/raspberry-pi-docker/</em></a></li>
+</ul>
+</aside>
+<p>In order to install Home Assistant, we will use Docker. Docker is a tool that allows you to run applications in a container on your Raspberry Pi. It is a great tool to run applications in a sandboxed environment, without affecting the rest of the system. It is also a great tool to run applications that are not available for your operating system.</p>
+<p>To install Docker on your Raspberry Pi, first, if you have not done it yet, login to your Raspberry Pi using SSH.</p>
+<pre>ssh wintermute@hal9000.local
+</pre>
+<p>Before you install Docker Engine for the first time on a new host machine, you need to set up the Docker apt repository. Afterward, you can install and update Docker from the repository.</p>
+<ol type="1">
+<li>Set up Docker&#39;s apt repository.<pre># Add Docker&#39;s official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+&#34;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+$(. /etc/os-release &amp;&amp; echo &#34;$VERSION_CODENAME&#34;) stable&#34; | \
+sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+sudo apt-get update
+</pre>
+</li>
+<li>Install the Docker packages<pre>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+</pre>
+</li>
+<li>For another user to be able to interact with Docker, it needs to be added to the <code>docker</code> group. So, our next step is to add our current user to the <code>docker</code> group by using the usermod command as shown below. By using <code>$USER</code> we are inserting the environment variable that stores the current users name.<pre>sudo usermod -aG docker $USER
+</pre>
+If we don&#39;t add our user to the group, we won&#39;t be able to interact with Docker without running as the root user.</li>
+<li>Since we made some changes to our user, we will now need to log out and log back in for it to take effect. You can log out by running the following command in the terminal.<pre>logout
+</pre>
+</li>
+<li>Now log back in using SSH by issuing the following command.<pre>ssh wintermute@hal9000.local
+</pre>
+</li>
+<li>Once you have logged back in, you can verify that the <code>docker</code> group has been successfully added to your user by running the following command.<pre>groups
+</pre>
+This command will list out all the groups that the current user is a part of. If everything worked as it should, the group <code>docker</code> should be listed here.</li>
+<li>Verify that the installation is successful by running the <code>hello-world</code> image<pre>docker run hello-world
+</pre>
+This command downloads a test image and runs it in a container. When the container runs, it prints a confirmation message and exits.</li>
+<li>If all went well, you should see the following output:<img alt="Docker Hello World Output" src="img/2cebf5d53a3ed321.png"></li>
+</ol>
+<p>You have now successfully installed and started Docker Engine.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Setup Home Assistant" duration="60">
+        <aside class="special"><p><strong>Info: </strong><em>Home Assistant configuration steps are an adapted transcript from this tutorial: </em><a href="https://www.home-assistant.io/getting-started/onboarding/" target="_blank"><em>https://www.home-assistant.io/getting-started/onboarding/</em></a></p>
+</aside>
+<p>Now that we have Docker installed, we can install Home Assistant. To do this, first, if you have not done it yet, login to your Raspberry Pi using SSH.</p>
+<pre>ssh wintermute@hal9000.local
+</pre>
+<p>We are going to use docker-compose to install Home Assistant. Docker Compose is a tool that allows you to define and run multi-container Docker applications. It is a great tool to run multiple Docker containers at the same time. We will start by moving to the home directory.</p>
+<pre>cd ~
+</pre>
+<p>Then we will create a directory to store the docker compose files and move to that directory.</p>
+<pre>mkdir -r docker/homeassistant
+cd docker/homeassistant
+</pre>
+<p>Now we will create a file called <code>compose.yml</code>.</p>
+<pre>touch compose.yml
+</pre>
+<p>And we will edit the file using nano.</p>
+<pre>nano compose.yml
+</pre>
+<p>And we will add the following content to the file:</p>
+<pre><code language="language-yaml" class="language-yaml">version: &#39;3&#39;
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: &#34;ghcr.io/home-assistant/home-assistant:stable&#34;
+    volumes:
+      - ${HOME}/homeassistant/config:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    environment:
+      - TZ=Europe/Lisbon
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+</code></pre>
+<p>You can copy it from here and paste it in the file.</p>
+<p>Note that you will need to change the <code>TZ</code> environment variable to your timezone. You can find a list of timezones here:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a></li>
+</ul>
+<p>To save the file press CTRL + X, followed by Y, then ENTER.</p>
+<p>Now we can start Home Assistant by running the following command:</p>
+<pre>docker compose up -d
+</pre>
+<p>Wait for a few minutes for Home Assistant to start. You can check the logs by running the following command:</p>
+<pre>docker compose logs -f
+</pre>
+<p>Or for checking only the logs for Home Assistant container:</p>
+<pre>docker compose logs -f homeassistant
+</pre>
+<p>Navigate to <a href="http://hal9000.local:8123" target="_blank">http://hal9000.local:8123</a> and you should see the Home Assistant welcome screen.</p>
+<aside class="warning"><p><strong>Note</strong>: Depending on your Raspberry Pi model, it may take a while for Home Assistant to start.</p>
+</aside>
+<p class="image-container"><img alt="Home Assistant Welcome Screen" src="img/c145c994a808900e.png"></p>
+<ol type="1">
+<li>Select <strong>Create my smart home</strong>.</li>
+<li>Enter a name, username, and password and select <strong>Create account</strong>.<aside class="warning"><p><strong>Warning</strong>: The username and password are used to protect access to Home Assistant. Make sure to choose a strong password and store it in a password manager. There is no way to recover the owner credentials.</p>
+</aside>
+<img alt="Home Assistant Welcome Screen" src="img/480b12e626fe13e5.png"></li>
+<li>Enter the location of your home.<aside class="special"><p><strong>Info</strong>:</p>
+<ul>
+<li>The location is used to populate settings such as time zone, unit system, and currency.</li>
+<li>It is also used for location-based information and automations: for example showing the weather-forecast, opening the shades at sunrise, or starting the vacuum when you leave the home.</li>
+<li>If you&#39;d rather not send your location, you can choose a location far away from where you live.</li>
+<li>You can always change this information later in the settings.</li>
+</ul>
+</aside>
+<img alt="Home Assistant Welcome Screen" src="img/c1d8b0a78f44f823.png"></li>
+<li>Select which information you are willing to share.<img alt="Home Assistant Welcome Screen" src="img/30c7d69e558b8d73.png"></li>
+<li>Once you are done click <strong>Next</strong>.<aside class="special"><p><strong>Info</strong>:</p>
+<ul>
+<li>Home Assistant will then show any devices it has discovered on your network.</li>
+<li>Don&#39;t be alarmed if you see fewer items than shown below; you can always manually add devices later.</li>
+</ul>
+</aside>
+<img alt="Home Assistant Welcome Screen" src="img/4bf13acb10994000.png"></li>
+<li>Finally, select <strong>Finish</strong> to enter the Home Assistant web interface.<aside class="special"><p><strong>Info</strong>: If some of your devices were discovered and set up automatically, this default dashboard may already show some of your devices.</p>
+</aside>
+</li>
+</ol>
+<p>You should now see the Home Assistant dashboard, and you are ready to start adding devices.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Install Sky Connect (optional)" duration="30">
+        <aside class="special"><p><strong>Info: </strong><em>This step has content transcribed from this tutorial: </em><a href="https://www.home-assistant.io/skyconnect/" target="_blank"><em>https://www.home-assistant.io/skyconnect/</em></a></p>
+</aside>
+<p>Sky Connect is a Zigbee gateway that allows you to connect Zigbee devices to Home Assistant. It is based on the CC2531 chip and it is compatible with the Zigbee2MQTT project. It is a great tool to connect Zigbee devices to Home Assistant, has a low price and is ease to use.</p>
+<p>To install Sky Connect we will need to adapt the docker-compose file we created in the previous step, in order to give the Home Assistant container access to the USB port where Sky Connect is connected. To do this, first, if you have not done it yet, login to your Raspberry Pi using SSH.</p>
+<pre>ssh wintermute@hal9000.local
+</pre>
+<p>Now navigate to the directory where you created the <code>compose.yml</code> file.</p>
+<pre>cd ~/docker/homeassistant
+</pre>
+<p>And stop Home Assistant by running the following command:</p>
+<pre>docker compose down
+</pre>
+<p>Now connect Sky Connect to the Raspberry Pi USB port. Give it a few seconds to be detected by the Raspberry Pi. You can issue the following command to check if it was detected:</p>
+<pre>lsusb
+</pre>
+<p>You should see an output similar to the following:</p>
+<p class="image-container"><img alt="lsusb Output" src="img/5c8cbd8253bac22.png"></p>
+<p>Now issue the following command to check to which <code>ttyUSB</code> port Sky Connect was connected:</p>
+<pre>ls /dev/ttyUSB*
+</pre>
+<p>You should see an output similar to the following:</p>
+<p class="image-container"><img alt="ls Output" src="img/8eb95fb11b949370.png"></p>
+<aside class="special"><p><strong>Info</strong>: In this case we only have one USB device connected to the Raspberry Pi, so we only see one <code>ttyUSB</code> port. If you have more than one USB device connected to your Raspberry Pi, you will probably see more than one <code>ttyUSB</code> port. If that is the case, disconnect the Sky Connect from the Raspberry Pi and run the command again. Take note of the <code>ttyUSB</code> ports that remain. Then connect Sky Connect to the Raspberry Pi and run the command again. The <code>ttyUSB</code> port that appears is the one where Sky Connect is connected.</p>
+</aside>
+<p>Now we have all the information we need to adapt the <code>compose.yml</code> file. Open the <code>compose.yml</code> file using nano for editing.</p>
+<pre>nano compose.yml
+</pre>
+<p>You will need to add a mapping for devices so that the container can access the host USB port.</p>
+<pre><code language="language-yaml" class="language-yaml">devices:
+  - /dev/ttyUSB0:/dev/ttyUSB0
+</code></pre>
+<p>You should end up with a file similar to the following:</p>
+<pre><code language="language-yaml" class="language-yaml">version: &#39;3&#39;
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: &#34;ghcr.io/home-assistant/home-assistant:stable&#34;
+    volumes:
+      - ${HOME}/homeassistant/config:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    environment:
+      - TZ=Europe/Lisbon
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+</code></pre>
+<p>To save the file press CTRL + X, followed by Y, then ENTER.</p>
+<p>Now we can start Home Assistant by running the following command:</p>
+<pre>docker compose up -d
+</pre>
+<p>Wait for a few minutes for Home Assistant to start and navigate to <a href="http://hal9000.local:8123" target="_blank">http://hal9000.local:8123</a>. Enter your credentials to enter the Home Assistant dashboard.</p>
+<p>On the left menu, click on <strong>Configuration</strong> and then on <strong>Devices &amp; Services</strong>. By now you should see the Sky Connect device listed, as it was automatically detected by Home Assistant.</p>
+<p class="image-container"><img alt="Home Assistant Sky Connect Device" src="img/57bd3e0a85df9853.png"></p>
+<p>Select <strong>Configure</strong>. You should see the following screen:</p>
+<p class="image-container"><img alt="Home Assistant Sky Connect Device" src="img/4049755c156c57a8.png"></p>
+<p>Select <strong>Submit</strong>. You should see the following screen:</p>
+<p class="image-container"><img alt="Home Assistant Sky Connect Device" src="img/99be22b2e653aae0.png"></p>
+<p>Select <strong>Create Network</strong>. Once the network has been set up you should see the following screen:</p>
+<p class="image-container"><img alt="Home Assistant Sky Connect Device" src="img/d863c468b4040691.png"></p>
+<p>Add the Zigbee Coordinator to an area and Select <strong>Finish</strong>. Your Zigbee devices are now added to your Zigbee network.</p>
+<p>Now you can add your Zigbee devices to Home Assistant. To do this, on <strong>Configuration &gt; Devices &amp; Services</strong> look for <strong>Zigbee Home Automation</strong>. You should see the following screen:</p>
+<p class="image-container"><img alt="Home Assistant Zigbee Home Automation" src="img/9009078421d18777.png"></p>
+<aside class="warning"><p><strong>Note</strong>: You will need to put your Zigbee device in pairing mode. Please refer to the device manual for instructions on how to do this. If ZHA can&#39;t find your Zigbee device make sure that SkyConnect does not suffer from interference. Use the extension cable and try placing the SkyConnect further away from potential devices which can cause interference.</p>
+</aside>
+<p>Click on <strong>1 device</strong> and select <strong>Add devices</strong> via this device. ZHA will now search for Zigbee devices in pairing mode. When detected follow the configurations steps and you should be ready to go!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Expose Home Assistant to the Internet (optional)" duration="60">
+        <aside class="warning"><p><strong>TODO</strong>: This is still a work in progress.</p>
+</aside>
+<h2 is-upgraded>Setup DuckDNS</h2>
+<aside class="warning"><p><strong>TODO</strong>: This is still a work in progress.</p>
+</aside>
+<h2 is-upgraded>Setup Swag</h2>
+<aside class="warning"><p><strong>TODO</strong>: This is still a work in progress.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Takeaways" duration="10">
+        <p>✅ &lt; Fill IN TAKEAWAY 1&gt; ✅ &lt; Fill IN TAKEAWAY 2&gt;</p>
+<p>Thanks for participating in this codelab!</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+<script>
+    // Override bo back and done for code labs. Currently default handling is not
+    // customizable. For more information on this see the following issue:
+    // https://github.com/googlecodelabs/tools/issues/103
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("arrow-back").href="https://tiago.santos.com.pt/codelabs";
+        document.getElementById("done").href="https://tiago.santos.com.pt/codelabs";
+    }, false);
+</script>
+</body>
+</html>

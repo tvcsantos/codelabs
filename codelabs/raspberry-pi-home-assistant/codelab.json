@@ -1,0 +1,22 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2024-01-02T10:21:47Z",
+  "id": "raspberry-pi-home-assistant",
+  "duration": 245,
+  "title": "H.A.R.P. - Home Assistant Raspberry Pi",
+  "summary": "",
+  "source": "markdown/raspberry-pi-home-assistant/raspberry-pi-home-assistant.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": null,
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/tvcsantos/codelabs/blob/master/markdown/raspberry-pi-home-assistant",
+  "url": "raspberry-pi-home-assistant"
+}
