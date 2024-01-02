@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "generate-headers": "npm install && node headers-parser.js",
+    "patch-go-home": "npm install && node patch-go-home.js"
+  },
+  "devDependencies": {
+    "glob": "^10.3.10",
+    "mkdirp": "^3.0.1"
+  }
+}

@@ -1,0 +1,9 @@
+<script>
+    // Override bo back and done for code labs. Currently default handling is not
+    // customizable. For more information on this see the following issue:
+    // https://github.com/googlecodelabs/tools/issues/103
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("arrow-back").href="{{homeUrl}}";
+        document.getElementById("done").href="{{homeUrl}}";
+    }, false);
+</script>

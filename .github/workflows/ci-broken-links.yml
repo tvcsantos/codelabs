@@ -1,0 +1,21 @@
+name: Check links for modified files in PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  broken-link-checker:
+    name: Broken Link Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          folder-path: "markdown"
+          use-quiet-mode: "yes"
+          config-file: ".github/broken-links-configuration.json"
+          check-modified-files-only: "yes"

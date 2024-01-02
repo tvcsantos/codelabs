@@ -1,2 +1,1 @@
 # codelabs
-Codelabs interactive tutorials

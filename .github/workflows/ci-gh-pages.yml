@@ -1,0 +1,86 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-to-gh-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current commit
+        uses: actions/checkout@v4
+
+      - name: Get GitHub App token
+        id: get-app-token
+        uses: getsentry/action-github-app-token@v2
+        with:
+          app_id: ${{ secrets.GHA_APP_ID }}
+          private_key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.5'
+          token: ${{ steps.get-app-token.outputs.token }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          token: ${{ steps.get-app-token.outputs.token }}
+          python-version: 3.x
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          token: ${{ steps.get-app-token.outputs.token }}
+          node-version: 18.x
+
+      - name: Install claat
+        run: go install github.com/googlecodelabs/tools/claat@latest
+
+      - name: Setup expected folder structure
+        shell: bash
+        # language=bash
+        run: |
+          mkdir dist
+          mkdir -p site/codelabs
+
+      - name: Export markdown files into site dir
+        shell: bash
+        # language=bash
+        run: |
+          labs=$(find "markdown" -type f -name "*.md")
+          
+          for file in $labs; do
+            folder="$(basename $file .md)"
+            claat export -o site/codelabs $file
+          done
+          
+          cd site
+          npm install
+          npm install gulp-cli -g
+          gulp dist --base-url="https://tiago.santos.com.pt/codelabs" --codelabs-dir="./codelabs/"
+          cd ..
+          cp -R site/dist/* dist/
+          rm -rf dist/codelabs
+          cp -R site/codelabs dist/
+
+      - name: Patch Go Home
+        shell: bash
+        # language=bash
+        run : CWD=$(pwd); cd bin; npm run patch-go-home ${CWD}/dist/codelabs "https://tiago.santos.com.pt/codelabs"
+
+      - name: Generate codelabs.json
+        shell: bash
+        # language=bash
+        run: CWD=$(pwd); cd bin; npm run generate-headers ${CWD}/markdown ${CWD}/dist
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./dist
+          github_token: ${{ steps.get-app-token.outputs.token }}
+
