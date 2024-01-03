@@ -403,94 +403,100 @@ We hope you have successfully learned how to increase and decrease the swap file
 Duration: 0:30:00
 
 > aside positive
-> **Info:** _This step has content transcribed from these tutorials:_
-> * _<https://docs.docker.com/engine/install/debian/#install-using-the-repository>_
-> * _<https://pimylifeup.com/raspberry-pi-docker/>_
+> **Info:** _This step has content transcribed from this tutorial: <https://pimylifeup.com/raspberry-pi-docker/>_
 
 In order to install Home Assistant, we will use Docker. Docker is a tool that allows you to run applications in a
 container on your Raspberry Pi. It is a great tool to run applications in a sandboxed environment, without affecting
 the rest of the system. It is also a great tool to run applications that are not available for your operating system.
 
-To install Docker on your Raspberry Pi, first, if you have not done it yet, login to your Raspberry Pi using SSH.
+### Installing Docker to the Raspberry Pi
 
-```console
-ssh wintermute@hal9000.local
-```
+Thanks to a nifty install script developed by the Docker team, installing the container software is incredibly simple.
 
-Before you install Docker Engine for the first time on a new host machine, you need to set up the Docker apt repository.
-Afterward, you can install and update Docker from the repository.
+1. First we need to login to our Raspberry Pi using SSH, if you have not done it yet.
 
-1. Set up Docker's apt repository.
+   ```console
+   ssh wintermute@hal9000.local
+   ```
 
-    ```console
-    # Add Docker's official GPG key:
-    sudo apt-get update
-    sudo apt-get install ca-certificates curl gnupg
-    sudo install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo chmod a+r /etc/apt/keyrings/docker.gpg
-    
-    # Add the repository to Apt sources:
-    echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    ```
+2. Now first of all we need to make sure that our system is up-to-date before we proceed to install Docker.
 
-2. Install the Docker packages
+   We can upgrade all existing packages by running the following two commands on the Raspberry Pi.
+   
+   ```console
+   sudo apt update
+   sudo apt upgrade
+   ```
 
-    ```console
-    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    ```
+3. With our Raspberry Pi entirely up to date, we can now go ahead and install Docker to the Raspberry Pi.
 
-3. For another user to be able to interact with Docker, it needs to be added to the `docker` group. So, our next step is
-   to add our current user to the `docker` group by using the usermod command as shown below. By using `$USER` we are
-   inserting the environment variable that stores the current users name.
+   Luckily for us, Docker has made this process incredibly quick and straightforward by providing a bash script that installs everything for you.
+   
+   You can download and run the official Docker setup script by running the following command.
+   
+   ```console
+   curl -sSL https://get.docker.com | sh
+   ```
+   
+   This command will pipe the script directly into the command line. Typically it would be best if you didn’t do this; however, Docker is a trusted source.
+   
+   If you are unsure about running this directly without first inspecting it, you can go directly to get.docker.com to view the script.
+   
+   This script can take some time to complete as it automatically detects and installs everything it needs to run Docker on the Raspberry Pi.
 
-    ```console
-    sudo usermod -aG docker $USER
-    ```
+### Setting up your User for Docker
 
+We need to make a slight adjustment to our user before we can start using Docker without issues.
+
+This is to do with the way that the Linux permission system works with Docker. By default, only the Docker user can interact with Docker but there is a way to work around this.
+
+1. Once Docker has finished installing to your Raspberry Pi, there are a couple more things we need to do.
+
+   For another user to be able to interact with Docker, it needs to be added to the docker group.
+   
+   So, our next step is to add our current user to the docker group by using the usermod command as shown below. By using “$USER” we are inserting the environment variable that stores the current users name.
+   
+   ```
+   sudo usermod -aG docker $USER
+   ```
+   
    If we don’t add our user to the group, we won’t be able to interact with Docker without running as the root user.
+   
+   If you want to learn more about permissions and groups in Linux, check out our file permissions in Linux guide.
 
-4. Since we made some changes to our user, we will now need to log out and log back in for it to take effect. You can
-   log out by running the following command in the terminal.
+2. Since we made some changes to our user, we will now need to log out and log back in for it to take effect.
 
-    ```console
-    logout
-    ```
+   You can log out by running the following command in the terminal.
+   
+   ```console
+   logout
+   ```
 
-5. Now log back in using SSH by issuing the following command.
+3. Once you have logged back in, you can verify that the docker group has been successfully added to your user by running the following command.
 
-    ```console
-    ssh wintermute@hal9000.local
-    ```
+   ```console
+   groups
+   ```
+   
+   This command will list out all the groups that the current user is a part of. If everything worked as it should, the group docker should be listed here.
 
-6. Once you have logged back in, you can verify that the `docker` group has been successfully added to your user by
-   running the following command.
+### Testing the Docker Installation on Raspberry Pi
 
-    ```console
-    groups
-    ```
+With Docker now set up on our Raspberry Pi, we should now go ahead and test to make sure it’s working.
 
-   This command will list out all the groups that the current user is a part of. If everything worked as it should, the
-   group `docker` should be listed here.
+1. To test if Docker is working, we are going to go ahead and run the following command on our Pi.
 
-7. Verify that the installation is successful by running the `hello-world` image
+   This command will tell Docker to download, setup and run a docker container called **hello-world**.
+   
+   ```console
+   docker run hello-world
+   ```
 
-    ```console
-    docker run hello-world
-    ```
-
-   This command downloads a test image and runs it in a container. When the container runs, it prints a confirmation
-   message and exits.
-
-8. If all went well, you should see the following output:
+2. If you have successfully installed Docker to your Raspberry Pi, you should see something like this.
 
    ![Docker Hello World Output](img/docker_hello_world_output.png)
 
-You have now successfully installed and started Docker Engine.
+You are now safe to start using Docker for your projects. Have fun!
 
 ## Setup Home Assistant
 
