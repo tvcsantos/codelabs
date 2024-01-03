@@ -422,7 +422,7 @@ Thanks to a nifty install script developed by the Docker team, installing the co
 2. Now first of all we need to make sure that our system is up-to-date before we proceed to install Docker.
 
    We can upgrade all existing packages by running the following two commands on the Raspberry Pi.
-   
+
    ```console
    sudo apt update
    sudo apt upgrade
@@ -430,55 +430,61 @@ Thanks to a nifty install script developed by the Docker team, installing the co
 
 3. With our Raspberry Pi entirely up to date, we can now go ahead and install Docker to the Raspberry Pi.
 
-   Luckily for us, Docker has made this process incredibly quick and straightforward by providing a bash script that installs everything for you.
-   
+   Luckily for us, Docker has made this process incredibly quick and straightforward by providing a bash script that
+   installs everything for you.
+
    You can download and run the official Docker setup script by running the following command.
-   
+
    ```console
    curl -sSL https://get.docker.com | sh
    ```
-   
-   This command will pipe the script directly into the command line. Typically it would be best if you didn’t do this; however, Docker is a trusted source.
-   
-   If you are unsure about running this directly without first inspecting it, you can go directly to get.docker.com to view the script.
-   
-   This script can take some time to complete as it automatically detects and installs everything it needs to run Docker on the Raspberry Pi.
+
+   This command will pipe the script directly into the command line. Typically, it would be best if you didn't do this;
+   however, Docker is a trusted source.
+
+   If you are unsure about running this directly without first inspecting it, you can go directly
+   to [get.docker.com](https://get.docker.com) to view the script.
+
+   This script can take some time to complete as it automatically detects and installs everything it needs to run Docker
+   on the Raspberry Pi.
 
 ### Setting up your User for Docker
 
 We need to make a slight adjustment to our user before we can start using Docker without issues.
 
-This is to do with the way that the Linux permission system works with Docker. By default, only the Docker user can interact with Docker but there is a way to work around this.
+This is to do with the way that the Linux permission system works with Docker. By default, only the Docker user can
+interact with Docker but there is a way to work around this.
 
 1. Once Docker has finished installing to your Raspberry Pi, there are a couple more things we need to do.
 
-   For another user to be able to interact with Docker, it needs to be added to the docker group.
-   
-   So, our next step is to add our current user to the docker group by using the usermod command as shown below. By using “$USER” we are inserting the environment variable that stores the current users name.
-   
+   For another user to be able to interact with Docker, it needs to be added to the `docker` group.
+
+   So, our next step is to add our current user to the `docker` group by using the usermod command as shown below. By
+   using `$USER` we are inserting the environment variable that stores the current users name.
+
    ```
    sudo usermod -aG docker $USER
    ```
-   
+
    If we don’t add our user to the group, we won’t be able to interact with Docker without running as the root user.
-   
-   If you want to learn more about permissions and groups in Linux, check out our file permissions in Linux guide.
 
 2. Since we made some changes to our user, we will now need to log out and log back in for it to take effect.
 
    You can log out by running the following command in the terminal.
-   
+
    ```console
    logout
    ```
 
-3. Once you have logged back in, you can verify that the docker group has been successfully added to your user by running the following command.
+3. Once you have logged back in, you can verify that the docker group has been successfully added to your user by
+   running the following command.
 
    ```console
    groups
    ```
-   
-   This command will list out all the groups that the current user is a part of. If everything worked as it should, the group docker should be listed here.
+
+   This command will list out all the groups that the current user is a part of. If everything worked as it should, the
+   group `docker` should be listed here.
 
 ### Testing the Docker Installation on Raspberry Pi
 
@@ -487,7 +493,7 @@ With Docker now set up on our Raspberry Pi, we should now go ahead and test to m
 1. To test if Docker is working, we are going to go ahead and run the following command on our Pi.
 
    This command will tell Docker to download, setup and run a docker container called **hello-world**.
-   
+
    ```console
    docker run hello-world
    ```
