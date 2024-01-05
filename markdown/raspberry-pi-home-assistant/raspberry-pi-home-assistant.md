@@ -530,7 +530,7 @@ cd ~
 Then we will create a directory to store the docker compose files and move to that directory.
 
 ```console
-mkdir -r docker/homeassistant
+mkdir -p docker/homeassistant
 cd docker/homeassistant
 ```
 
